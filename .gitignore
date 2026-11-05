@@ -1,0 +1,44 @@
+# Intelligent Classroom Monitoring
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+*.egg
+.env
+venv/
+.venv/
+env/
+models/*.pt
+models/*.onnx
+models/*.engine
+evidence/
+runs/
+data/face_database/embeddings/
+data/face_database/photos/
+data/raw/
+data/processed/
+logs/
+*.log
+.idea/
+.vscode/
+*.swp
+node_modules/
+frontend/dist/
+frontend/build/
+.DS_Store
+Thumbs.db
+.ipynb_checkpoints/
+# Environment files
+.env.*
+!.env.example
+
+# Temporary debugging
+temp_debug/
+scratch_frame_*.jpg
+test_frame*.jpg
+
+# Temporary files
+*.tmp

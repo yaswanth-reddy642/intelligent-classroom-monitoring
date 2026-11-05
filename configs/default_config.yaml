@@ -1,0 +1,128 @@
+# ============================================================
+# Intelligent Classroom Monitoring - Master Configuration
+# ============================================================
+# All system parameters in one file. No hardcoded thresholds
+# scattered across the codebase. Override via environment vars.
+# ============================================================
+
+# --- Video Input ---
+video:
+  source_type: "webcam"          # webcam, file, rtsp
+  source_path: "0"               # device index, file path, or RTSP URL
+  inference_resolution: [640, 640]
+  display_resolution: [1280, 720]
+  frame_skip: 2                  # Process every Nth frame (1 = every frame, 2 = every 2nd)
+  max_fps: 30
+
+# --- Object Detection (YOLOv11) ---
+# Phone detection accuracy improvements:
+# - Lowered phone confidence_threshold to 0.40 (phones are small objects, YOLO is less confident)
+# - Kept person threshold high via class-specific filtering in the pipeline
+# - Using imgsz=640 for best speed/accuracy balance on CPU
+detection:
+  model_path: "models/yolo11n.pt"
+  confidence_threshold: 0.10     # Multi-angle sensitivity for handheld and tilted mobile phones
+  iou_threshold: 0.45
+  image_size: 640                # 640 is optimal for yolo11n on CPU
+  device: "cpu"                  # cpu, cuda, cuda:0
+  max_detections: 100
+  half_precision: false          # FP16 inference (GPU only)
+
+  # Per-class confidence overrides (applied after detection)
+  # Solid threshold for persons avoids false person detections
+  # Sensitive threshold for phones catches handheld phones reliably at multiple angles
+  class_confidence:
+    person: 0.48                 # Person needs solid confidence to eliminate partial/ghost boxes
+    phone: 0.10                  # Highly sensitive to catch angled, tilted, landscape & lap phones
+
+# --- Class Mapping ---
+# Maps model output class IDs to project class names
+# Default: COCO pretrained (person=0, cell phone=67)
+class_mapping:
+  student:
+    model_class_id: 0            # COCO 'person'
+    model_class_name: "person"
+  mobile_phone:
+    model_class_id: 67           # COCO 'cell phone'
+    model_class_name: "cell phone"
+
+# --- Face Recognition (SFace + YuNet Deep Biometrics) ---
+face_recognition:
+  enabled: true
+  model_name: "sface"
+  similarity_threshold: 0.38
+  max_faces_per_student: 5
+  embedding_dimension: 128
+  face_database_path: "uploads/photos"
+  min_face_size: 25
+  detection_threshold: 0.35
+
+# --- Multi-Object Tracking (ByteTrack) ---
+tracking:
+  track_thresh: 0.10             # Matches multi-angle phone detection threshold (0.10)
+  track_buffer: 50               # Keep lost tracks longer across quick angled occlusions
+  match_thresh: 0.8              # Matching threshold
+  frame_rate: 30                 # Expected frame rate
+
+# --- Student-Phone Association ---
+association:
+  max_distance: 0.40             # Proximity bound for student-phone matching (covers extended arms)
+  iou_threshold: 0.05            # Catches phones held at lap, desk, or tilted positions
+  temporal_window: 15            # Association memory window
+  min_association_score: 0.15    # Threshold for pairing student with phone
+
+# --- Temporal Behavior Analysis ---
+temporal:
+  min_phone_duration: 1.5        # Seconds of sustained phone use before alerting
+  temporal_window: 30.0          # Seconds of history to maintain
+  min_consecutive_detections: 2  # Responsive confirmation of sustained phone use
+  persistence_threshold: 0.35    # Persistence ratio for phone usage across angle movements
+
+# --- Classroom Context ---
+context:
+  default_mode: "LECTURE"        # LECTURE, EXAM, AUTHORIZED_PHONE_ACTIVITY, BREAK
+  mode_multipliers:
+    LECTURE: 1.0
+    EXAM: 1.5
+    AUTHORIZED_PHONE_ACTIVITY: 0.1
+    BREAK: 0.2
+
+# --- Anomaly Scoring ---
+# A = w1*D + w2*S + w3*T + w4*C
+anomaly:
+  weights:
+    phone_detection: 0.30        # w1 - increased phone detection weight
+    association: 0.25            # w2 - student-phone association
+    temporal_persistence: 0.25   # w3 - temporal persistence
+    context: 0.20                # w4 - context multiplier
+  thresholds:
+    suspicious: 0.30             # Warning threshold
+    anomaly: 0.58                # Confirmed phone violation anomaly threshold
+
+# --- Alert Engine ---
+alerts:
+  cooldown_seconds: 60           # Min seconds between alerts for same student
+  evidence_capture: true
+  evidence_path: "evidence"
+  evidence_retention_days: 30
+
+# --- Camera ---
+camera:
+  camera_id: "CAM-01"
+
+# --- Database ---
+database:
+  mongodb_uri: "mongodb://localhost:27017"
+  database_name: "classroom_monitoring"
+
+# --- Server ---
+server:
+  host: "0.0.0.0"
+  port: 8000
+  frontend_url: "http://localhost:5173"
+
+# --- Logging ---
+logging:
+  level: "INFO"                  # DEBUG, INFO, WARNING, ERROR
+  log_file: "logs/classroom_monitoring.log"
+  console: true

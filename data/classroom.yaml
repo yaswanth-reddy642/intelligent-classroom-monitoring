@@ -1,0 +1,11 @@
+# Classroom Monitoring Dataset Configuration
+# 2-Class High-Speed Detection Architecture (Target: 30-40 FPS)
+path: ../datasets/classroom  # Dataset root directory
+train: images/train          # Train images (relative to 'path')
+val: images/val              # Validation images (relative to 'path')
+test: images/test            # Optional test images
+
+# Target Classes for Classroom Monitoring
+names:
+  0: student
+  1: mobile_phone

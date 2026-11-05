@@ -1,0 +1,61 @@
+# ============================================================
+# Research Model Configuration
+# ============================================================
+
+# --- CNN-LSTM Baseline ---
+cnn_lstm:
+  backbone: "resnet18"
+  pretrained: true
+  embedding_dim: 512
+  lstm_hidden: 256
+  lstm_layers: 2
+  dropout: 0.3
+  sequence_length: 16
+  freeze_backbone_epochs: 5
+
+# --- Temporal Transformer (Proposed) ---
+temporal_transformer:
+  backbone: "resnet18"
+  pretrained: true
+  embedding_dim: 512
+  num_layers: 4
+  num_heads: 8
+  ff_dim: 2048
+  dropout: 0.1
+  sequence_length: 16
+  max_seq_len: 64
+  freeze_backbone_epochs: 5
+
+# --- Training ---
+training:
+  batch_size: 8
+  learning_rate: 0.001
+  weight_decay: 0.0001
+  epochs: 50
+  early_stopping_patience: 10
+  scheduler_patience: 5
+  scheduler_factor: 0.5
+  num_workers: 4
+  pin_memory: true
+
+# --- Data ---
+data:
+  sequence_length: 16
+  frame_size: [224, 224]
+  frame_sampling_rate: 2
+  train_split: 0.7
+  val_split: 0.15
+  test_split: 0.15
+
+# --- Reproducibility ---
+seeds: [42, 123, 456]
+
+# --- Learned Temporal Model Integration ---
+# Options: disabled, cnn_lstm, temporal_transformer
+learned_temporal_model: "disabled"
+
+# --- Score Fusion ---
+fusion:
+  learned_weight: 0.5
+  context_weight: 0.5
+  mode: "weighted_average"  # weighted_average, max, learned_only, context_only

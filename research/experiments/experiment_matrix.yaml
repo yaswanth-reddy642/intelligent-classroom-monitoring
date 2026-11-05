@@ -1,0 +1,25 @@
+experiments:
+  - id: "E1"
+    name: "Baseline CNN-LSTM"
+    dataset: "VAD-Classroom"
+    model: "CNNLSTM"
+    metrics: ["AUC", "F1"]
+    output_path: "results/vad/e1.csv"
+  - id: "E2"
+    name: "Temporal Transformer"
+    dataset: "VAD-Classroom"
+    model: "TemporalTransformer"
+    metrics: ["AUC", "F1"]
+    output_path: "results/vad/e2.csv"
+  - id: "E3"
+    name: "Ablation-YOLO-Only"
+    dataset: "VAD-Classroom"
+    model: "YOLOv11"
+    metrics: ["F1"]
+    output_path: "results/ablation/e3.csv"
+  - id: "E4"
+    name: "Ablation-Full"
+    dataset: "VAD-Classroom"
+    model: "Proposed"
+    metrics: ["F1", "AUC"]
+    output_path: "results/ablation/e4.csv"
