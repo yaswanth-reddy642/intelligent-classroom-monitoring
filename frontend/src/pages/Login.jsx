@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, useLocation, Link } from 'react-router-dom'
 import { LogIn, Eye, EyeOff, Shield, CheckCircle } from 'lucide-react'
+import { API_BASE } from '../services/api'
 
 export default function Login() {
   const navigate = useNavigate()
@@ -19,7 +20,7 @@ export default function Login() {
     setError('')
     setLoading(true)
     try {
-      const res = await fetch('/api/auth/login', {
+      const res = await fetch(`${API_BASE}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),

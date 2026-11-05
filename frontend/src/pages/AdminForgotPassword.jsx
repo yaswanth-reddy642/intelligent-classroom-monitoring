@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { KeyRound, CheckCircle } from 'lucide-react'
+import { API_BASE } from '../services/api'
 
 export default function AdminForgotPassword() {
   const [step, setStep] = useState(1)
@@ -16,7 +17,7 @@ export default function AdminForgotPassword() {
     setError('')
     setLoading(true)
     try {
-      const res = await fetch('/api/auth/admin-forgot-password', {
+      const res = await fetch(`${API_BASE}/api/auth/admin-forgot-password`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
       })
@@ -33,7 +34,7 @@ export default function AdminForgotPassword() {
     if (newPassword.length < 6) { setError('Password must be at least 6 characters'); return }
     setLoading(true)
     try {
-      const res = await fetch('/api/auth/admin-reset-password', {
+      const res = await fetch(`${API_BASE}/api/auth/admin-reset-password`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, reset_code: resetCode, new_password: newPassword }),
       })

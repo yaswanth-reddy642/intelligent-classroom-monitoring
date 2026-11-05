@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { Shield, Eye, EyeOff } from 'lucide-react'
+import { API_BASE } from '../services/api'
 
 export default function AdminLogin() {
   const navigate = useNavigate()
@@ -14,7 +15,7 @@ export default function AdminLogin() {
     setError('')
     setLoading(true)
     try {
-      const res = await fetch('/api/auth/admin-login', {
+      const res = await fetch(`${API_BASE}/api/auth/admin-login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
