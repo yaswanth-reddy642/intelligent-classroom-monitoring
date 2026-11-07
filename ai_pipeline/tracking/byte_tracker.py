@@ -45,7 +45,18 @@ class ByteTrackWrapper:
         try:
             import supervision as sv
 
-            self._tracker = sv.ByteTrack(
+            if hasattr(sv, "ByteTrack"):
+                tracker_cls = sv.ByteTrack
+            else:
+                try:
+                    from supervision.tracker.byte_tracker.core import ByteTrack as tracker_cls
+                except ImportError:
+                    try:
+                        from trackers import ByteTrackTracker as tracker_cls
+                    except ImportError:
+                        raise AttributeError("ByteTrack not found in supervision. Please install supervision<0.31.0")
+
+            self._tracker = tracker_cls(
                 track_activation_threshold=self._config.track_thresh,
                 lost_track_buffer=self._config.track_buffer,
                 minimum_matching_threshold=self._config.match_thresh,
